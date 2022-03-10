@@ -8,8 +8,43 @@
 #
 
 library(shiny)
+library(lubridate)
+library(ggplot2)
+library(shinydashboard)
+library(dplyr)
+library(stringr)
+
+#read all file names in a temp variable
+temp = list.files(pattern="parta..tsv")
+allData2 <- lapply(temp, read.delim)
+allData <- do.call(rbind, allData2)
+
+#converting dates
+allData$newDate <- as.Date(allData$date, "%m/%d/%Y")
+allData$date <- NULL
+lat_long <- read.table(file = "CTA_-_System_Information_-_List_of__L__Stops.tsv", sep = "\t", header = TRUE, quote = "\"")
+lat_long$lines <- str_extract(lat_long$STATION_DESCRIPTIVE_NAME, "\\(.*\\)")
+lat_long$lines <- str_remove_all(lat_long$lines, "[\\(\\)]")
+lat_long <- lat_long %>% distinct(MAP_ID, lines, .keep_all = TRUE)
+mergedData <- merge(x = allData, y= lat_long, by.x = c("station_id"), by.y = c("MAP_ID"), all.x = TRUE)
+
+
+mergedData$Location[mergedData$stationname == 'Homan'] = "(41.884914, -87.711327)"
+mergedData$lines[mergedData$stationname == 'Homan'] = "Green Line"
+
+mergedData$Location[mergedData$stationname == 'Madison/Wabash'] = "(41.882023, -87.626098)"
+mergedData$lines[mergedData$stationname == 'Madison/Wabash'] = "Brown, Green, Orange, Pink & Purple Lines"
+
+mergedData$Location[mergedData$stationname == 'Randolph/Wabash'] = "(41.884431, -87.626149)"
+mergedData$lines[mergedData$stationname == 'Randolph/Wabash'] = "Green, Orange, Pink, Purple & Brown Lines"
+
+mergedData$Location[mergedData$stationname == 'Washington/State'] = "(41.8837, -87.6278)"
+mergedData$lines[mergedData$stationname == 'Washington/State'] = "Red Line"
+
+
 
 # Define UI for application that draws a histogram
+
 ui <- fluidPage(
   
   # Application title
