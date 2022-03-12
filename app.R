@@ -108,18 +108,27 @@ ui <- dashboardPage(
                        )
                 ),
                 
-                column(5, 
+                column(10, 
                        
                        
-                       fluidRow(style='height:30vh',
+                       fluidRow(style='height:40vh',
                                 box( title = textOutput("text"), solidHeader = TRUE, status = "primary", width = 12,
                                      plotOutput("hist1")
                                 )
                        ),
                        
                        fluidRow(style='height:50vh',
+                                column(6,
+                                       leafletOutput("mymap")
+                                ),
                                 
-                                leafletOutput("mymap")
+                                column(4, 
+                                       box(solidHeader = TRUE, status = "primary", width = 180,
+                                           dataTableOutput("barplottable")
+                                       )
+                                )
+                                
+                                
                                 
                        )   
                        
@@ -127,19 +136,11 @@ ui <- dashboardPage(
                        
                        
                        
-                ),
-                
-                
-                
-                column(5,
-                       
-                       
-                       box(solidHeader = TRUE, status = "primary", width = 200,
-                           dataTableOutput("barplottable")
-                       )
-                       
-                       
                 )
+                
+                
+                
+                
                 
                 
               )
@@ -150,7 +151,11 @@ ui <- dashboardPage(
       ),
       
       tabItem(tabName= "about"
-              
+              h2("About"), 
+              p("Application written by Gautam Kushwah for CS424 spring 2022 taught by Dr. Andrew Johnson"),
+              p("Data taken from https://data.cityofchicago.org/Transportation/CTA-Ridership-L-Station-Entries-Daily-Totals/5neh-572f"),
+              p("The app helps visualize CTA L data over the last 20 years and helps uncover trends in data"),
+              p("Reference for R functions through https://shiny.rstudio.com/reference/shin")
       )
       
     )
@@ -348,9 +353,7 @@ server <- function(input, output, session) {
     }
   })
   
-  observeEvent(input$date2, {
-    print(input$date2)
-  })
+  
   
   
 }
