@@ -18,6 +18,7 @@ library(leaflet.providers)
 library(leaflet.extras)
 library(DT)
 library(shinyjs)
+library(tidyverse)
 
 jsCode <- 'shinyjs.markerClick = function(id) {
               map.eachLayer(function (layer) {
@@ -88,14 +89,23 @@ ui <- dashboardPage(
               fluidRow(
                 
                 column(2,
-                       p("Input controls"),
-                       fluidRow(style="height:40vh"),
-                       dateInput("date1", "Date:", value = "2021-08-23"),
                        
+                       fluidRow(style="height:40vh"),
+                       p("Input controls"),
+                       dateInput("date1", "Date:", value = "2021-08-23"),
+                       dateInput("date2", "Date 2:", value = "2020-08-23"),
                        actionButton("prevDay", "Previous Day"),
                        actionButton("nextDay", "Next  Day"),
                        selectInput("orders", "Select the order of bar chart", orders, selected = "Alphabetical"),
-                       selectInput(inputId = "station", label = "Select station", choices = NULL)
+                       selectInput(inputId = "station", label = "Select station", choices = NULL),
+                       radioButtons(
+                         inputId = "radio",
+                         label = "Mode",
+                         choices = c("Single Date", "Different Dates"),
+                         selected = "Single Date",
+                         inline = FALSE,
+                         width = NULL
+                       )
                 ),
                 
                 column(5, 
@@ -107,7 +117,7 @@ ui <- dashboardPage(
                                 )
                        ),
                        
-                       fluidRow(style='height:40vh',
+                       fluidRow(style='height:50vh',
                                 
                                 leafletOutput("mymap")
                                 
@@ -154,13 +164,16 @@ ui <- dashboardPage(
 # Define server logic required to draw a histogram
 server <- function(input, output, session) {
   date1 <- reactive({input$date1})
+  date2 <- reactive({input$date2})
   orders <- reactive({input$orders})   #order for the bar plot
   values <- reactiveValues(selected=NULL)
+  mode <- reactive({input$radio}) ###checking for which mode the user is in
   
   
   #   code for dynamic header
   output$text <-renderText({ paste("Total entries for", date( input$date1), ", ", weekdays(input$date1) ) })
   tmpdata <- reactive({ subset(mergedData, newDate==input$date1)})
+  tmpdata2 <-reactive ({subset(mergedData, newDate==input$date2) })
   #   dfnew3 <- reactive({data.frame(tmpdata()$stationname, tmpdata()$rides)})
   #   names(dfnew3) <- c("Station", "Rides")
   
@@ -186,14 +199,36 @@ server <- function(input, output, session) {
   
   
   output$hist1 <- renderPlot({
+    
+    
     tmpdata <- subset(mergedData, newDate==date1())
-    if(orders() == "Descending"){
-      ggplot(tmpdata, aes(x=reorder(stationname, -rides), y=rides)) +labs(x="station ", y = "Total number of entries") + geom_bar(stat="identity", position="dodge", fill="deepskyblue4") + scale_x_discrete(guide=guide_axis( angle = 45))
-    }else if(orders()=="Ascending"){
-      ggplot(tmpdata, aes(x=reorder(stationname, rides), y=rides)) +labs(x="station ", y = "Total number of entries") + geom_bar(stat="identity", position="dodge", fill="deepskyblue4") + scale_x_discrete(guide=guide_axis( angle = 45))
-    } else{
-      ggplot(tmpdata, aes(x=stationname, y=rides)) +labs(x="station ", y = "Total number of entries") + geom_bar(stat="identity", position="dodge", fill="deepskyblue4") + scale_x_discrete(guide=guide_axis( angle = 45))
+    
+    if(mode()=="Single Date"){
+      if(orders() == "Descending"){
+        ggplot(tmpdata, aes(x=reorder(stationname, -rides), y=rides)) +labs(x="station ", y = "Total number of entries") + geom_bar(stat="identity", position="dodge", fill="deepskyblue4") + scale_x_discrete(guide=guide_axis( angle = 45))
+      }else if(orders()=="Ascending"){
+        ggplot(tmpdata, aes(x=reorder(stationname, rides), y=rides)) +labs(x="station ", y = "Total number of entries") + geom_bar(stat="identity", position="dodge", fill="deepskyblue4") + scale_x_discrete(guide=guide_axis( angle = 45))
+      } else{
+        ggplot(tmpdata, aes(x=stationname, y=rides)) +labs(x="station ", y = "Total number of entries") + geom_bar(stat="identity", position="dodge", fill="deepskyblue4") + scale_x_discrete(guide=guide_axis( angle = 45))
+      }  
+    }else{  ##if two dates are selected
+      
+      dfl <- tmpdata %>% full_join(tmpdata2(), by="station_id")
+      dfl <- dfl[!is.na(dfl$stationname.x),]
+      dfl$rides.y <- replace_na(dfl$rides.y, 0)
+      dfl$diff = dfl$rides.x - dfl$rides.y    
+      
+      if(orders() == "Descending"){
+        ggplot(dfl, aes(x=reorder(stationname.x, -diff), y=diff)) +labs(x="station ", y = "Total number of entries") + geom_bar(stat="identity", position="dodge", fill="deepskyblue4") + scale_x_discrete(guide=guide_axis( angle = 45))
+      }else if(orders()=="Ascending"){
+        ggplot(dfl, aes(x=reorder(stationname.x, diff), y=diff)) +labs(x="station ", y = "Total number of entries") + geom_bar(stat="identity", position="dodge", fill="deepskyblue4") + scale_x_discrete(guide=guide_axis( angle = 45))
+      } else{
+        ggplot(dfl, aes(x=stationname.x, y=diff)) +labs(x="station ", y = "Total number of entries") + geom_bar(stat="identity", position="dodge", fill="deepskyblue4") + scale_x_discrete(guide=guide_axis( angle = 45))
+      }
+      
+      
     }
+    
     
   })
   
@@ -232,12 +267,37 @@ server <- function(input, output, session) {
   
   output$barplottable <- renderDataTable({
     df <- tmpdata()
-    df <- df[, c("stationname", "rides", "lines")]
-    datatable(df, 
-              options = list(searching = FALSE,pageLength = 10, lengthMenu = c(5, 10, 15)
+    df2 <- tmpdata2()
+    
+    if(mode()=="Single Date"){
+      dfl <- df[, c("stationname", "rides", "lines")]
+      fm <- "rides"
+    }else{
+      dfl <- df %>% full_join(df2, by="station_id")
+      dfl <- dfl[!is.na(dfl$stationname.x),]
+      dfl$rides.y <- replace_na(dfl$rides.y, 0)
+      dfl$diff = dfl$rides.x - dfl$rides.y 
+      dfl <- dfl[, c("stationname.x", "diff", "lines.x")]
+      fm <- "diff"
+    }
+    
+    
+    
+    
+    if(orders() == "Descending"){
+      tab_order <- list(list(2, 'dsc'))
+    } else if(orders()=="Ascending"){
+      tab_order <- list(list(2, 'asc'))
+    } else{
+      tab_order <- list(list(1, 'asc'))
+    }
+    datatable(dfl, 
+              options = list(
+                searching = FALSE,pageLength = 10, lengthMenu = c(5, 10, 15),
+                order = tab_order
               )) %>% 
       formatCurrency(2, currency = "", interval = 3, mark = ",")%>%
-      formatRound('rides', digits = 0)
+      formatRound(fm, digits = 0)
   })
   
   
@@ -251,7 +311,7 @@ server <- function(input, output, session) {
     values$selected <- event$id
     if (is.null(event))
       return()
-    print(length(input$mymap_click))
+    # print(length(input$mymap_click))
     if(length(input$mymap_click) > 0) {
       updateSelectInput(session = session, inputId = "station", selected =  values$selected)
     }  
@@ -277,6 +337,19 @@ server <- function(input, output, session) {
     # }
     
     
+  })
+  
+  
+  observeEvent(input$radio, {
+    if(input$radio == "Single Date"){
+      shinyjs::hide(id="date2")
+    }else{
+      shinyjs::show(id="date2")
+    }
+  })
+  
+  observeEvent(input$date2, {
+    print(input$date2)
   })
   
   
