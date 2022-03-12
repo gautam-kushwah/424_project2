@@ -16,6 +16,16 @@ library(stringr)
 library(leaflet)
 library(leaflet.providers)
 library(leaflet.extras)
+library(DT)
+library(shinyjs)
+
+jsCode <- 'shinyjs.markerClick = function(id) {
+              map.eachLayer(function (layer) {
+                if (layer.options.layerId == id) {
+                  layer.fire("click");
+                }
+              })
+           };'
 
 #read all file names in a temp variable
 temp = list.files(pattern="parta..tsv")
@@ -47,7 +57,7 @@ mergedData$lines[mergedData$stationname == 'Washington/State'] = "Red Line"
 mergedData$lat <- as.numeric(str_extract(mergedData$Location, "\\d+.\\d+"))
 mergedData$long <- as.numeric(str_extract(mergedData$Location, "-\\d+.\\d+"))
 orders <- c("Alphabetical", "Ascending", "Descending")
-
+# newchoices <- subset(mergedData, newDate=="2021-08-23") %>% distinct(stationname) %>% arrange()
 
 ui <- dashboardPage(
   dashboardHeader(title="Sleepy Subway"),
@@ -68,6 +78,8 @@ ui <- dashboardPage(
   
   
   dashboardBody(
+    shinyjs::useShinyjs(),
+    shinyjs::extendShinyjs(text = jsCode, functions = c('markerClick')),
     tabItems(
       
       tabItem(tabName = "dashboard",
@@ -82,8 +94,8 @@ ui <- dashboardPage(
                        
                        actionButton("prevDay", "Previous Day"),
                        actionButton("nextDay", "Next  Day"),
-                       selectInput("orders", "Select the order of bar chart", orders, selected = "Alphabetical")
-                       
+                       selectInput("orders", "Select the order of bar chart", orders, selected = "Alphabetical"),
+                       selectInput(inputId = "station", label = "Select station", choices = NULL)
                 ),
                 
                 column(5, 
@@ -112,7 +124,9 @@ ui <- dashboardPage(
                 column(5,
                        
                        
-                       
+                       box(solidHeader = TRUE, status = "primary", width = 200,
+                           dataTableOutput("barplottable")
+                       )
                        
                        
                 )
@@ -140,11 +154,23 @@ ui <- dashboardPage(
 # Define server logic required to draw a histogram
 server <- function(input, output, session) {
   date1 <- reactive({input$date1})
-  orders <- reactive({input$orders})
+  orders <- reactive({input$orders})   #order for the bar plot
+  values <- reactiveValues(selected=NULL)
+  
+  
   #   code for dynamic header
   output$text <-renderText({ paste("Total entries for", date( input$date1), ", ", weekdays(input$date1) ) })
+  tmpdata <- reactive({ subset(mergedData, newDate==input$date1)})
+  #   dfnew3 <- reactive({data.frame(tmpdata()$stationname, tmpdata()$rides)})
+  #   names(dfnew3) <- c("Station", "Rides")
   
-  
+  choices_stations <- reactive({
+    choices_stations <- tmpdata() %>% distinct(stationname) %>% arrange()
+    
+  })
+  observe({
+    updateSelectInput(session = session, inputId = "station", choices = choices_stations())
+  })
   observeEvent(input$prevDay, {
     curDate <- date1()
     curDate <- curDate - 1
@@ -156,6 +182,7 @@ server <- function(input, output, session) {
     curDate <- curDate + 1
     updateDateInput(session, "date1", value = curDate)
   })
+  
   
   
   output$hist1 <- renderPlot({
@@ -179,9 +206,9 @@ server <- function(input, output, session) {
       addCircleMarkers(data = df, lat = ~lat, lng = ~long, 
                        
                        radius = ~log(rides+10)*1.25,
-                       
+                       layerId = ~stationname,
                        popup = paste("<center><strong>" ,df$stationname, "</strong>", "<br>",
-                                     df$line, "<br>",
+                                     df$lines, "<br>",
                                      "Rides: ", df$rides, "<br> </center>")
       )%>%
       setView( lat = 41.8781, lng = -87.6298, zoom = 10) %>%
@@ -192,11 +219,65 @@ server <- function(input, output, session) {
         baseGroups = c("Base", "Satellite", "Positron"),
         options = layersControlOptions(collapsed = FALSE)
       )
-    
+    map <- map %>% 
+      htmlwidgets::onRender("
+          function(el, x) {
+            map = this;
+          }"
+      )     
     return(map)
     
   })
   
+  
+  output$barplottable <- renderDataTable({
+    df <- tmpdata()
+    df <- df[, c("stationname", "rides", "lines")]
+    datatable(df, 
+              options = list(searching = FALSE,pageLength = 10, lengthMenu = c(5, 10, 15)
+              )) %>% 
+      formatCurrency(2, currency = "", interval = 3, mark = ",")%>%
+      formatRound('rides', digits = 0)
+  })
+  
+  
+  
+  
+  ### observer for map
+  observe({
+    proxy <- leafletProxy("mymap")
+    proxy %>% clearPopups() 
+    event <- input$mymap_marker_click
+    values$selected <- event$id
+    if (is.null(event))
+      return()
+    print(length(input$mymap_click))
+    if(length(input$mymap_click) > 0) {
+      updateSelectInput(session = session, inputId = "station", selected =  values$selected)
+    }  
+    
+    
+  })
+  
+  ### anotherObserver
+  observeEvent(input$station, {
+    proxy <- leafletProxy("mymap")
+    proxy %>% clearPopups() 
+    shinyjs::js$markerClick(input$station)
+    # df <- tmpdata()
+    # values$selected <- input$station
+    # df <- subset(df, stationname == values$selected)
+    # print("it comes here")
+    
+    # content <-  paste("<center><strong>" ,df$stationname, "</strong>", "<br>",
+    #                   df$lines, "<br>",
+    #                   "Rides: ", df$rides, "<br> </center>")
+    # if(length(input$mymap_click) == 0){
+    #     leafletProxy("mymap") %>% addPopups(df$long, df$lat, content)
+    # }
+    
+    
+  })
   
   
 }
