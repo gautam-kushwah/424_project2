@@ -13,6 +13,9 @@ library(ggplot2)
 library(shinydashboard)
 library(dplyr)
 library(stringr)
+library(leaflet)
+library(leaflet.providers)
+library(leaflet.extras)
 
 #read all file names in a temp variable
 temp = list.files(pattern="parta..tsv")
@@ -41,43 +44,161 @@ mergedData$lines[mergedData$stationname == 'Randolph/Wabash'] = "Green, Orange, 
 mergedData$Location[mergedData$stationname == 'Washington/State'] = "(41.8837, -87.6278)"
 mergedData$lines[mergedData$stationname == 'Washington/State'] = "Red Line"
 
+mergedData$lat <- as.numeric(str_extract(mergedData$Location, "\\d+.\\d+"))
+mergedData$long <- as.numeric(str_extract(mergedData$Location, "-\\d+.\\d+"))
+orders <- c("Alphabetical", "Ascending", "Descending")
 
 
-# Define UI for application that draws a histogram
-
-ui <- fluidPage(
-  
+ui <- dashboardPage(
+  dashboardHeader(title="Sleepy Subway"),
   # Application title
-  titlePanel("Old Faithful Geyser Data"),
   
-  # Sidebar with a slider input for number of bins 
-  sidebarLayout(
-    sidebarPanel(
-      sliderInput("bins",
-                  "Number of bins:",
-                  min = 1,
-                  max = 50,
-                  value = 30)
-    ),
+  dashboardSidebar(
     
-    # Show a plot of the generated distribution
-    mainPanel(
-      plotOutput("distPlot")
+    
+    sidebarMenu(
+      br(),br(),br(),br(), br(),br(),br(),br(), br(),br(),br(),br(), br(),br(),br(),br(), 
+      menuItem("Home", tabName = "dashboard", icon = NULL),
+      
+      menuItem("About", tabName = "about", icon = NULL)
+      
     )
+    
+  ),
+  
+  
+  dashboardBody(
+    tabItems(
+      
+      tabItem(tabName = "dashboard",
+              
+              
+              fluidRow(
+                
+                column(2,
+                       p("Input controls"),
+                       fluidRow(style="height:40vh"),
+                       dateInput("date1", "Date:", value = "2021-08-23"),
+                       
+                       actionButton("prevDay", "Previous Day"),
+                       actionButton("nextDay", "Next  Day"),
+                       selectInput("orders", "Select the order of bar chart", orders, selected = "Alphabetical")
+                       
+                ),
+                
+                column(5, 
+                       
+                       
+                       fluidRow(style='height:30vh',
+                                box( title = textOutput("text"), solidHeader = TRUE, status = "primary", width = 12,
+                                     plotOutput("hist1")
+                                )
+                       ),
+                       
+                       fluidRow(style='height:40vh',
+                                
+                                leafletOutput("mymap")
+                                
+                       )   
+                       
+                       
+                       
+                       
+                       
+                ),
+                
+                
+                
+                column(5,
+                       
+                       
+                       
+                       
+                       
+                )
+                
+                
+              )
+              
+              
+              
+              
+      ),
+      
+      tabItem(tabName= "about"
+              
+      )
+      
+    )
+    
+    
   )
+  
+  
 )
 
 # Define server logic required to draw a histogram
-server <- function(input, output) {
+server <- function(input, output, session) {
+  date1 <- reactive({input$date1})
+  orders <- reactive({input$orders})
+  #   code for dynamic header
+  output$text <-renderText({ paste("Total entries for", date( input$date1), ", ", weekdays(input$date1) ) })
   
-  output$distPlot <- renderPlot({
-    # generate bins based on input$bins from ui.R
-    x    <- faithful[, 2]
-    bins <- seq(min(x), max(x), length.out = input$bins + 1)
-    
-    # draw the histogram with the specified number of bins
-    hist(x, breaks = bins, col = 'darkgray', border = 'white')
+  
+  observeEvent(input$prevDay, {
+    curDate <- date1()
+    curDate <- curDate - 1
+    updateDateInput(session, "date1", value = curDate)
   })
+  
+  observeEvent(input$nextDay, {
+    curDate <- date1()
+    curDate <- curDate + 1
+    updateDateInput(session, "date1", value = curDate)
+  })
+  
+  
+  output$hist1 <- renderPlot({
+    tmpdata <- subset(mergedData, newDate==date1())
+    if(orders() == "Descending"){
+      ggplot(tmpdata, aes(x=reorder(stationname, -rides), y=rides)) +labs(x="station ", y = "Total number of entries") + geom_bar(stat="identity", position="dodge", fill="deepskyblue4") + scale_x_discrete(guide=guide_axis( angle = 45))
+    }else if(orders()=="Ascending"){
+      ggplot(tmpdata, aes(x=reorder(stationname, rides), y=rides)) +labs(x="station ", y = "Total number of entries") + geom_bar(stat="identity", position="dodge", fill="deepskyblue4") + scale_x_discrete(guide=guide_axis( angle = 45))
+    } else{
+      ggplot(tmpdata, aes(x=stationname, y=rides)) +labs(x="station ", y = "Total number of entries") + geom_bar(stat="identity", position="dodge", fill="deepskyblue4") + scale_x_discrete(guide=guide_axis( angle = 45))
+    }
+    
+  })
+  
+  
+  output$mymap <- renderLeaflet({
+    df <- subset(mergedData, newDate==date1())
+    
+    map <- leaflet(options= leafletOptions()) %>%
+      addTiles(group="Base") %>% 
+      addCircleMarkers(data = df, lat = ~lat, lng = ~long, 
+                       
+                       radius = ~log(rides+10)*1.25,
+                       
+                       popup = paste("<center><strong>" ,df$stationname, "</strong>", "<br>",
+                                     df$line, "<br>",
+                                     "Rides: ", df$rides, "<br> </center>")
+      )%>%
+      setView( lat = 41.8781, lng = -87.6298, zoom = 10) %>%
+      addResetMapButton() %>%
+      addProviderTiles(providers$Esri.WorldImagery, group="Satellite") %>%
+      addProviderTiles("CartoDB.Positron", group="Positron") %>%
+      addLayersControl(
+        baseGroups = c("Base", "Satellite", "Positron"),
+        options = layersControlOptions(collapsed = FALSE)
+      )
+    
+    return(map)
+    
+  })
+  
+  
+  
 }
 
 # Run the application 
