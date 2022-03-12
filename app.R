@@ -485,7 +485,32 @@ server <- function(input, output, session) {
     
   })
   
+  output$yearly <- renderPlot({
+    
+    dft <- mergedData
+    dft <- subset(dft, stationname==yearly_station())
+    ggplot(dft, aes(x= year(newDate), y=rides)) +labs(x="Year ", y = "Total number of entries") + geom_bar(stat="identity", position="dodge", fill="deepskyblue4") 
+    
+  })
   
+  
+  output$monthly <- renderPlot({
+    
+    dft <- single_df()
+    dft <- subset(dft, stationname==yearly_station())
+    ggplot(dft, aes(x= month(newDate), y=rides)) +labs(x="Months (1 = Jan, 12=Dec)", y="Total number of entries") + geom_bar(stat="identity", position="dodge", fill="deepskyblue4")  + scale_x_continuous(breaks = seq(1, 12, by = 1)) + ggtitle(paste("Station Name: ", input$yearly_station), subtitle=paste("Year", input$years))
+    
+  })
+  
+  
+  output$weekly <- renderPlot({
+    
+    dft <- single_df()
+    dft <- subset(dft, stationname==yearly_station())
+    f <- factor(weekdays(dft$newDate), levels = c('Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'))
+    ggplot(dft, aes(x= f, y=rides)) +labs(x="Days of the week", y="Total number of entries") + geom_bar(stat="identity", position="dodge", fill="deepskyblue4")  + ggtitle(paste("Station Name: ", input$yearly_station), subtitle=paste("Year", input$years))
+    
+  })
   
   
   
