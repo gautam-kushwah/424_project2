@@ -58,6 +58,7 @@ mergedData$lines[mergedData$stationname == 'Washington/State'] = "Red Line"
 mergedData$lat <- as.numeric(str_extract(mergedData$Location, "\\d+.\\d+"))
 mergedData$long <- as.numeric(str_extract(mergedData$Location, "-\\d+.\\d+"))
 orders <- c("Alphabetical", "Ascending", "Descending")
+years<-c(2001:2021)
 # newchoices <- subset(mergedData, newDate=="2021-08-23") %>% distinct(stationname) %>% arrange()
 
 ui <- dashboardPage(
@@ -71,7 +72,9 @@ ui <- dashboardPage(
       br(),br(),br(),br(), br(),br(),br(),br(), br(),br(),br(),br(), br(),br(),br(),br(), 
       menuItem("Home", tabName = "dashboard", icon = NULL),
       
-      menuItem("About", tabName = "about", icon = NULL)
+      menuItem("About", tabName = "about", icon = NULL),
+      
+      menuItem("Yearly Plots", tabName = "yearlyPlots", icon = NULL)
       
     )
     
@@ -150,7 +153,68 @@ ui <- dashboardPage(
               
       ),
       
-      tabItem(tabName= "about"
+      tabItem(tabName="yearlyPlots",
+              
+              fluidRow(
+                
+                column(2,
+                       
+                       fluidRow(style="height:40vh"),
+                       p("Input controls"),
+                       selectInput("years", "Select the year", years, selected = "2021"),
+                       selectInput(inputId = "yearly_station", label = "Select station", choices = NULL),
+                       selectInput("order_for_single", "Select the order of bar chart", orders, selected = "Alphabetical")
+                       
+                ),
+                column(10,
+                       
+                       column(6, 
+                              
+                              fluidRow(style="height:40vh", 
+                                       box( title = "Daily entries", solidHeader = TRUE, status = "primary", width = 12,
+                                            plotOutput("daily")
+                                       )
+                                       
+                              ),
+                              
+                              fluidRow(style="height: 40vh", 
+                                       
+                                       leafletOutput("mymap2")
+                              )
+                              
+                       ),
+                       column(4,
+                              
+                              fluidRow(
+                                column(12, 
+                                       box( title = "Yearly entries", solidHeader = TRUE, status = "primary", width = 12,
+                                            plotOutput("yearly")
+                                       )
+                                )
+                              ),
+                              fluidRow(
+                                column(6,
+                                       box( title = "Monthly entries", solidHeader = TRUE, status = "primary", width = 12,
+                                            plotOutput("monthly")
+                                       )
+                                ),
+                                column(6, 
+                                       box( title = "Day of Week entries", solidHeader = TRUE, status = "primary", width = 12,
+                                            plotOutput("weekly")
+                                       )
+                                )
+                                
+                              )
+                              
+                       )
+                       
+                )
+                
+              )
+              
+      ),
+      
+      tabItem(tabName= "about",
               h2("About"), 
               p("Application written by Gautam Kushwah for CS424 spring 2022 taught by Dr. Andrew Johnson"),
               p("Data taken from https://data.cityofchicago.org/Transportation/CTA-Ridership-L-Station-Entries-Daily-Totals/5neh-572f"),
@@ -173,7 +237,10 @@ server <- function(input, output, session) {
   orders <- reactive({input$orders})   #order for the bar plot
   values <- reactiveValues(selected=NULL)
   mode <- reactive({input$radio}) ###checking for which mode the user is in
+  single_year <- reactive({input$years})
+  yearly_station <- reactive({input$yearly_station})
   
+  single_df <- reactive({ subset(mergedData, year(newDate)==single_year()) })
   
   #   code for dynamic header
   output$text <-renderText({ paste("Total entries for", date( input$date1), ", ", weekdays(input$date1) ) })
@@ -186,9 +253,23 @@ server <- function(input, output, session) {
     choices_stations <- tmpdata() %>% distinct(stationname) %>% arrange()
     
   })
+  
+  choices_stations_new <- reactive({
+    choices_stations_new <- single_df() %>% distinct(stationname) %>% arrange()
+    
+  })
+  
+  
   observe({
     updateSelectInput(session = session, inputId = "station", choices = choices_stations())
   })
+  
+  ####updating station list on the yearly plot page, single df is the data frame
+  observe({
+    updateSelectInput(session = session, inputId = "yearly_station", choices = choices_stations_new(), selected="UIC-Halsted")
+  })
+  
+  
   observeEvent(input$prevDay, {
     curDate <- date1()
     curDate <- curDate - 1
@@ -355,6 +436,62 @@ server <- function(input, output, session) {
   
   
   
+  
+  
+  
+  
+  
+  ########### yearly page
+  
+  
+  output$mymap2 <- renderLeaflet({
+    df <- subset(mergedData, newDate==date1())
+    
+    map <- leaflet(options= leafletOptions()) %>%
+      addTiles(group="Base") %>% 
+      addCircleMarkers(data = df, lat = ~lat, lng = ~long, 
+                       
+                       radius = ~log(rides+10)*1.25,
+                       layerId = ~stationname,
+                       popup = paste("<center><strong>" ,df$stationname, "</strong>", "<br>",
+                                     df$lines, "<br>",
+                                     "Rides: ", df$rides, "<br> </center>")
+      )%>%
+      setView( lat = 41.8781, lng = -87.6298, zoom = 10) %>%
+      addResetMapButton() %>%
+      addProviderTiles(providers$Esri.WorldImagery, group="Satellite") %>%
+      addProviderTiles("CartoDB.Positron", group="Positron") %>%
+      addLayersControl(
+        baseGroups = c("Base", "Satellite", "Positron"),
+        options = layersControlOptions(collapsed = FALSE)
+      )
+    map <- map %>% 
+      htmlwidgets::onRender("
+          function(el, x) {
+            map = this;
+          }"
+      )     
+    return(map)
+    
+  })
+  
+  
+  
+  output$daily <- renderPlot({
+    
+    dft <- single_df()
+    dft <- subset(dft, stationname==yearly_station())
+    ggplot(dft, aes(x= newDate, y=rides)) +labs(x="Date ", y = "Total number of entries") + geom_bar(stat="identity", position="dodge", fill="deepskyblue4") 
+    
+  })
+  
+  
+  
+  
+  
+  
+  
+  ##############last bracket
   
 }
 
