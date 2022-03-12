@@ -163,7 +163,7 @@ ui <- dashboardPage(
                        p("Input controls"),
                        selectInput("years", "Select the year", years, selected = "2021"),
                        selectInput(inputId = "yearly_station", label = "Select station", choices = NULL),
-                       selectInput("order_for_single", "Select the order of bar chart", orders, selected = "Alphabetical")
+                       selectInput("order_for_single", "Select chart Type", c("BarPlot", "Table"), selected = "BarPlot")
                        
                 ),
                 column(10,
@@ -172,8 +172,9 @@ ui <- dashboardPage(
                               
                               fluidRow(style="height:40vh", 
                                        box( title = "Daily entries", solidHeader = TRUE, status = "primary", width = 12,
-                                            plotOutput("daily")
+                                            plotOutput("daily"), dataTableOutput("tableDaily")
                                        )
+                                       
                                        
                               ),
                               
@@ -188,19 +189,20 @@ ui <- dashboardPage(
                               fluidRow(
                                 column(12, 
                                        box( title = "Yearly entries", solidHeader = TRUE, status = "primary", width = 12,
-                                            plotOutput("yearly")
+                                            plotOutput("yearly"), dataTableOutput("tableYearly")
                                        )
+                                       
                                 )
                               ),
                               fluidRow(
                                 column(6,
                                        box( title = "Monthly entries", solidHeader = TRUE, status = "primary", width = 12,
-                                            plotOutput("monthly")
+                                            plotOutput("monthly"), dataTableOutput("tableMonthly")
                                        )
                                 ),
                                 column(6, 
                                        box( title = "Day of Week entries", solidHeader = TRUE, status = "primary", width = 12,
-                                            plotOutput("weekly")
+                                            plotOutput("weekly"), dataTableOutput("tableWeekly")
                                        )
                                 )
                                 
@@ -236,6 +238,7 @@ server <- function(input, output, session) {
   date2 <- reactive({input$date2})
   orders <- reactive({input$orders})   #order for the bar plot
   values <- reactiveValues(selected=NULL)
+  yearly_values <- reactiveValues(selected="UIC-Halsted")
   mode <- reactive({input$radio}) ###checking for which mode the user is in
   single_year <- reactive({input$years})
   yearly_station <- reactive({input$yearly_station})
@@ -425,12 +428,61 @@ server <- function(input, output, session) {
     
   })
   
+  ##############for second map
+  
+  ### observer for map
+  observe({
+    proxy <- leafletProxy("mymap2")
+    proxy %>% clearPopups() 
+    event <- input$mymap2_marker_click
+    yearly_values$selected <- event$id
+    if (is.null(event))
+      return()
+    # print(length(input$mymap_click))
+    if(length(input$mymap2_click) > 0) {
+      updateSelectInput(session = session, inputId = "yearly_station", selected =  yearly_values$selected)
+    }  
+    
+    
+  })
+  
+  
+  observeEvent(input$yearly_station, {
+    proxy <- leafletProxy("mymap2")
+    proxy %>% clearPopups() 
+    shinyjs::js$markerClick(input$yearly_station)
+    
+  })
   
   observeEvent(input$radio, {
     if(input$radio == "Single Date"){
       shinyjs::hide(id="date2")
     }else{
       shinyjs::show(id="date2")
+    }
+  })
+  
+  
+  observeEvent(input$order_for_single, {
+    if(input$order_for_single == "BarPlot"){
+      shinyjs::hide(id="tableYearly")
+      shinyjs::hide(id="tableMonthly")
+      shinyjs::hide(id="tableWeekly")
+      shinyjs::hide(id="tableDaily")
+      shinyjs::show(id="yearly")
+      shinyjs::show(id="monthly")
+      shinyjs::show(id="weekly")
+      shinyjs::show(id="daily")
+      
+    }else{
+      shinyjs::hide(id="yearly")
+      shinyjs::hide(id="monthly")
+      shinyjs::hide(id="weekly")
+      shinyjs::hide(id="daily")
+      shinyjs::show(id="tableYearly")
+      shinyjs::show(id="tableMonthly")
+      shinyjs::show(id="tableWeekly")
+      shinyjs::show(id="tableDaily")
     }
   })
   
@@ -512,7 +564,76 @@ server <- function(input, output, session) {
     
   })
   
+  output$tableYearly <- renderDataTable({
+    
+    df<- subset(mergedData, stationname==yearly_station()) %>%
+      mutate(year = format(newDate, "%Y")) %>%
+      group_by(year) %>%
+      summarise(rides = sum(rides))
+    
+    
+    
+    datatable(df, 
+              options = list(
+                searching = FALSE,pageLength = 10, lengthMenu = c(5, 10, 15),
+                order = list(list(1, 'asc'))
+              )) %>% 
+      formatCurrency(2, currency = "", interval = 3, mark = ",")%>%
+      formatRound('rides', digits = 0)
+  })
   
+  
+  output$tableMonthly <- renderDataTable({
+    
+    df<- subset(mergedData, stationname==yearly_station()) %>%
+      mutate(month = month(newDate)) %>%
+      group_by(month) %>%
+      summarise(rides = sum(rides))
+    
+    
+    
+    datatable(df, 
+              options = list(
+                searching = FALSE,pageLength = 10, lengthMenu = c(5, 10, 15),
+                order = list(list(1, 'asc'))
+              )) %>% 
+      formatCurrency(2, currency = "", interval = 3, mark = ",")%>%
+      formatRound('rides', digits = 0)
+  })
+  
+  
+  output$tableWeekly <- renderDataTable({
+    
+    df<- subset(mergedData, stationname==yearly_station()) %>%
+      mutate(weekdays = weekdays(newDate)) %>%
+      group_by(weekdays) %>%
+      summarise(rides = sum(rides))
+    
+    
+    
+    datatable(df, 
+              options = list(
+                searching = FALSE,pageLength = 10, lengthMenu = c(5, 10, 15),
+                order = list(list(1, 'asc'))
+              )) %>% 
+      formatCurrency(2, currency = "", interval = 3, mark = ",")%>%
+      formatRound('rides', digits = 0)
+  })
+  
+  output$tableDaily <- renderDataTable({
+    df<- single_df()
+    df<- subset(mergedData, stationname==yearly_station()) 
+    
+    df <- df[, c("newDate", "rides")]
+    
+    datatable(df, 
+              options = list(
+                searching = FALSE,pageLength = 10, lengthMenu = c(5, 10, 15),
+                order = list(list(1, 'asc'))
+              )) %>% 
+      formatCurrency(2, currency = "", interval = 3, mark = ",")%>%
+      formatRound('rides', digits = 0)
+  })
   
   
   
