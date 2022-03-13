@@ -19,6 +19,7 @@ library(leaflet.extras)
 library(DT)
 library(shinyjs)
 library(tidyverse)
+library(RColorBrewer)
 
 jsCode <- 'shinyjs.markerClick = function(id) {
               map.eachLayer(function (layer) {
@@ -59,6 +60,9 @@ mergedData$lat <- as.numeric(str_extract(mergedData$Location, "\\d+.\\d+"))
 mergedData$long <- as.numeric(str_extract(mergedData$Location, "-\\d+.\\d+"))
 orders <- c("Alphabetical", "Ascending", "Descending")
 years<-c(2001:2021)
+LtoM <-colorRampPalette(c('red', 'red' ))
+Mid <- "snow3"
+MtoH <-colorRampPalette(c('green', 'darkgreen'))
 # newchoices <- subset(mergedData, newDate=="2021-08-23") %>% distinct(stationname) %>% arrange()
 
 ui <- dashboardPage(
@@ -116,13 +120,13 @@ ui <- dashboardPage(
                        
                        fluidRow(style='height:40vh',
                                 box( title = textOutput("text"), solidHeader = TRUE, status = "primary", width = 12,
-                                     plotOutput("hist1")
+                                     plotOutput("hist1", height="36vh"), height="40vh"
                                 )
                        ),
                        
-                       fluidRow(style='height:50vh',
+                       fluidRow(style='height:50vh; margin-top: 50px',
                                 column(6,
-                                       leafletOutput("mymap")
+                                       leafletOutput("mymap", height="40vh")
                                 ),
                                 
                                 column(4, 
@@ -308,11 +312,11 @@ server <- function(input, output, session) {
       dfl$diff = dfl$rides.x - dfl$rides.y    
       
       if(orders() == "Descending"){
-        ggplot(dfl, aes(x=reorder(stationname.x, -diff), y=diff)) +labs(x="station ", y = "Total number of entries") + geom_bar(stat="identity", position="dodge", fill="deepskyblue4") + scale_x_discrete(guide=guide_axis( angle = 45))
+        ggplot(dfl, aes(x=reorder(stationname.x, -diff), y=diff, fill=diff)) +labs(x="station ", y = "Total number of entries") + geom_bar(stat="identity", position="dodge") + scale_x_discrete(guide=guide_axis( angle = 45)) + scale_fill_gradient2(low=LtoM(100), mid='snow3', high=MtoH(100), space='Lab')
       }else if(orders()=="Ascending"){
-        ggplot(dfl, aes(x=reorder(stationname.x, diff), y=diff)) +labs(x="station ", y = "Total number of entries") + geom_bar(stat="identity", position="dodge", fill="deepskyblue4") + scale_x_discrete(guide=guide_axis( angle = 45))
+        ggplot(dfl, aes(x=reorder(stationname.x, diff), y=diff, fill=diff)) +labs(x="station ", y = "Total number of entries") + geom_bar(stat="identity", position="dodge") + scale_x_discrete(guide=guide_axis( angle = 45)) + scale_fill_gradient2(low=LtoM(100), mid='snow3', high=MtoH(100), space='Lab')
       } else{
-        ggplot(dfl, aes(x=stationname.x, y=diff)) +labs(x="station ", y = "Total number of entries") + geom_bar(stat="identity", position="dodge", fill="deepskyblue4") + scale_x_discrete(guide=guide_axis( angle = 45))
+        ggplot(dfl, aes(x=stationname.x, y=diff, fill=diff)) +labs(x="station ", y = "Total number of entries") + geom_bar(stat="identity", position="dodge") + scale_x_discrete(guide=guide_axis( angle = 45)) +  scale_fill_gradient2(low=LtoM(100), mid='snow3', high=MtoH(100), space='Lab')
       }
       
       
