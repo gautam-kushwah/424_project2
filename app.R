@@ -349,13 +349,15 @@ server <- function(input, output, session) {
   
   output$mymap <- renderLeaflet({
     df <- subset(mergedData, newDate==date1())
-    
+    df$line_color <-  str_extract(df$line, "\\w+")
     map <- leaflet(options= leafletOptions()) %>%
       addTiles(group="Base") %>% 
       addCircleMarkers(data = df, lat = ~lat, lng = ~long, 
                        
                        radius = ~log(rides+10)*1.25,
                        layerId = ~stationname,
+                       color = ~line_color,
+                       fillOpacity = 0.7,
                        popup = paste("<center><strong>" ,df$stationname, "</strong>", "<br>",
                                      df$lines, "<br>",
                                      "Rides: ", df$rides, "<br> </center>")
@@ -392,7 +394,8 @@ server <- function(input, output, session) {
       dfl$rides.y <- replace_na(dfl$rides.y, 0)
       dfl$diff = dfl$rides.x - dfl$rides.y 
       dfl <- dfl[, c("stationname.x", "diff", "lines.x")]
-      fm <- "diff"
+      colnames(dfl) <- c("Station Name", "Difference", "Lines")
+      fm <- "Difference"
     }
     
     
@@ -523,13 +526,15 @@ server <- function(input, output, session) {
   
   output$mymap2 <- renderLeaflet({
     df <- subset(mergedData, newDate==date1())
-    
+    df$line_color <-  str_extract(df$line, "\\w+")
     map <- leaflet(options= leafletOptions()) %>%
       addTiles(group="Base") %>% 
       addCircleMarkers(data = df, lat = ~lat, lng = ~long, 
                        
                        radius = ~log(rides+10)*1.25,
                        layerId = ~stationname,
+                       color = ~line_color,
+                       fillOpacity = 0.6,
                        popup = paste("<center><strong>" ,df$stationname, "</strong>", "<br>",
                                      df$lines, "<br>",
                                      "Rides: ", df$rides, "<br> </center>")
