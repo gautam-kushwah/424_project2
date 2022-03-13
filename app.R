@@ -19,7 +19,7 @@ library(leaflet.extras)
 library(DT)
 library(shinyjs)
 library(tidyverse)
-library(RColorBrewer)
+library(reshape2) 
 
 jsCode <- 'shinyjs.markerClick = function(id) {
               map.eachLayer(function (layer) {
@@ -58,6 +58,27 @@ mergedData$lines[mergedData$stationname == 'Washington/State'] = "Red Line"
 
 mergedData$lat <- as.numeric(str_extract(mergedData$Location, "\\d+.\\d+"))
 mergedData$long <- as.numeric(str_extract(mergedData$Location, "-\\d+.\\d+"))
+cta <- c("#c60c30", "#00a1de", "#62361b", "#009b3a", "#522398", "#522398", "#f9e300", "#e27ea6", "#f9461c")
+
+
+################
+
+trial <-mergedData[, c("stationname", "RED", "BLUE","BRN", "G","P", "Pexp", "Y", "Pnk", "O")]
+trial <- melt(trial, value.name = "group", id="stationname")
+trial <- subset(trial, group=="true")
+trial <- trial %>% distinct()
+trial <- trial %>% group_by(variable)
+trial$group <- factor(trial$group)
+
+mergedData <- merge(mergedData, trial, by = 'stationname')
+
+
+
+###############
+
+
+
+
 orders <- c("Alphabetical", "Ascending", "Descending")
 years<-c(2001:2021)
 LtoM <-colorRampPalette(c('red', 'red' ))
@@ -298,11 +319,11 @@ server <- function(input, output, session) {
     
     if(mode()=="Single Date"){
       if(orders() == "Descending"){
-        ggplot(tmpdata, aes(x=reorder(stationname, -rides), y=rides)) +labs(x="station ", y = "Total number of entries") + geom_bar(stat="identity", position="dodge", fill="deepskyblue4") + scale_x_discrete(guide=guide_axis( angle = 45))
+        ggplot(tmpdata, aes(x=reorder(stationname, -rides), y=rides, fill=variable)) +labs(x="station ", y = "Total number of entries") + geom_bar(stat="identity") + scale_x_discrete(guide=guide_axis( angle = 45)) +  scale_fill_manual(values = cta)
       }else if(orders()=="Ascending"){
-        ggplot(tmpdata, aes(x=reorder(stationname, rides), y=rides)) +labs(x="station ", y = "Total number of entries") + geom_bar(stat="identity", position="dodge", fill="deepskyblue4") + scale_x_discrete(guide=guide_axis( angle = 45))
+        ggplot(tmpdata, aes(x=reorder(stationname, rides), y=rides, fill=variable)) +labs(x="station ", y = "Total number of entries") + geom_bar(stat="identity") + scale_x_discrete(guide=guide_axis( angle = 45))  + scale_fill_manual(values = cta)
       } else{
-        ggplot(tmpdata, aes(x=stationname, y=rides)) +labs(x="station ", y = "Total number of entries") + geom_bar(stat="identity", position="dodge", fill="deepskyblue4") + scale_x_discrete(guide=guide_axis( angle = 45))
+        ggplot(tmpdata, aes(x=stationname, y=rides, fill=variable)) +labs(x="station ", y = "Total number of entries") + geom_bar(stat="identity") + scale_x_discrete(guide=guide_axis( angle = 45))  + scale_fill_manual(values = cta)
       }  
     }else{  ##if two dates are selected
       
