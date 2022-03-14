@@ -121,9 +121,13 @@ The data consists of 5 columns and about 1.09 million rows.
 
 The columns are as follows
 **station_id** - Unique ID for a station
+
 **stationname** - The name of the station
+
 **date** - The date of the entries
+
 **daytype** - W=Weekday, A=Saturday, U=Sunday/Holiday
+
 **rides** - total number of ridership on that date
 
 
@@ -133,21 +137,37 @@ The other files which contained the latitude and longitude of the stations was a
 The columns are as follows
 
 **STOP_ID**  
+
 **DIRECTION_ ID** Normal Direction of train taffic at the platform
+
 **STOP_NAME**
+
 **STATION_NAME**
+
 **STATION_DESCRIPTIVE_NAME**	- A more fully descriptive name of a station. 
+
 **MAP_ID**
+
 **ADA**	- Boolean (if the station is ada compliant)
+
 **RED** - Boolean (if the station serves red line)
+
 **BLUE** - Boolean (if the station serves blue line)
+
 **G** - Boolean (if the station serves green line)
+
 **BRN** - Boolean (if the station serves brown line)
+
 **P** - Boolean (if the station serves purple line)
+
 **Pexp** - Boolean (if the station serves Purple Express line)
+
 **Y** - Boolean (if the station serves Yellow line)
+
 **Pnk** - Boolean (if the station serves Pink line)
+
 **O** - Boolean (if the station serves Orange line)
+
 **Location** - The latitude and longitude values
 
 
@@ -202,17 +222,16 @@ lat_long <- lat_long %>% distinct(MAP_ID, lines, .keep_all = TRUE)
 mergedData <- merge(x = allData, y= lat_long, by.x = c("station_id"), by.y = c("MAP_ID"), all.x = TRUE)
 ```
   
-I then extracted the lat
-The next step included breaking down the entire dataset into three individual data sets, each based on the stations I was interested in. For this project, I used three stations namely : **UIC-Halsted**, **O’Hare Airport** and one closest to which I live i.e **Polk**.
+Next step was mapping the data onto the map for which I used the library **Leaflet**
+  
+The basic syntax is below and a more detailed one could be viewed on the github repo the link for which has been provided above
+```
+map <- leaflet(options= leafletOptions()) %>%
+      addTiles(group="Base") %>% 
+      addCircleMarkers(data = df, lat = ~lat, lng = ~long, )
+```
 
-
-Each dataset had to grouped by three criterias:
-1. Years
-2. Months in that year
-3. Days in that Month
-
-Each of which was done dynamically using the choices provided by the user using reactive elements in R.
-I used the library **dplyr** for chaining/piping commands and R commands such as “subset” and “group_by” to get the subset of data based on the station and then group that data based on days, months or years, respectively.
+The code for plotting various tables and bar graphs could also be found there
 
 
 
@@ -222,9 +241,9 @@ I used the library **dplyr** for chaining/piping commands and R commands such as
 
 
 The github repo for the source code could be found below
-[Github Repo CS424](https://github.com/gautam-kushwah/cs424)
+[Github Repo CS424](https://github.com/gautam-kushwah/424_project2)
 
-The source code is the file called **app.R**, with all the broken uptsv files named from partaa.tsv to partah.tsv
+The source code is the file called **app.R**, with all the broken uptsv files named from partaa.tsv to partah.tsv and also the location data file.
 
 To run the code you would need to download and install R and R-Studio the links to which could be found [!here](https://repo.miserver.it.umich.edu/cran/) and [here](https://rstudio.com/products/rstudio/download/) respectively 
 
