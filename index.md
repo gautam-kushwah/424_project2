@@ -95,6 +95,20 @@ The different dates mode enables the user to select two different dates and then
 
 
 
+## Yearly Plots Page
+
+The yearly data visualizations in the form of bar graphs breaking down data across all years, individual years, months, and even days in a week over a month for a particular station.
+
+The user can select the station from the list of all the stations on the left or from tapping a station on the mao. The user can also select the year for which they want to see thr visualisations.
+
+The user can also select whether they want to see the visualisations in the form of bar plots or in the form of tables.
+
+<img width="1440" alt="image" src="https://user-images.githubusercontent.com/40148194/158270629-d9195c2e-d8af-47f3-8539-b5fa07174121.png">
+
+
+
+
+
 
 # About the Data
 
@@ -111,6 +125,11 @@ The columns are as follows
 **date** - The date of the entries
 **daytype** - W=Weekday, A=Saturday, U=Sunday/Holiday
 **rides** - total number of ridership on that date
+
+
+
+The other files which contained the latitude and longitude of the stations was also taken from Chicago data portal which could be found [here](https://data.cityofchicago.org/Transportation/CTA-System-Information-List-of-L-Stops/8pix-ypme)
+
 
 
 The date was provided in a chr format, therefore it had to be converted into a usable format which was achieved through a R library called **lubridate**
