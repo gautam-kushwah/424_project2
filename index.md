@@ -304,10 +304,25 @@ To refer to the instructions on how to use and interact with app, please read th
   <img width="733" alt="image" src="https://user-images.githubusercontent.com/40148194/158277979-f15ebe30-f339-4354-b7fe-14c6ca249bc7.png">
   
   
-  More stations were added to the red line in loop
+ Washington was abandoned on the red line
   
-### 4
+the following ridership information on October 24th shows no entries for washington
+  <img width="600" alt="image" src="https://user-images.githubusercontent.com/40148194/158279081-1fec1436-d90f-4903-9e7a-51bdefd9092e.png">
+
+ The last day wshington has any ridership information
+  <img width="1407" alt="image" src="https://user-images.githubusercontent.com/40148194/158279208-bf0629e0-63e0-46e8-a9ac-56630749d74f.png">
+
   
+  A zoomed in view
+  
+  <img width="495" alt="image" src="https://user-images.githubusercontent.com/40148194/158279290-228b4898-4c51-4c89-b7df-e0bf6789070d.png">
+  
+  
+  Daily entries for Washington for the year 2006
+  
+  <img width="752" alt="image" src="https://user-images.githubusercontent.com/40148194/158279566-df101170-e2eb-4a46-bd1a-fc515779bcc9.png">
+
+
   
   
 ### 4
