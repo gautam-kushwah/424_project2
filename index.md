@@ -261,9 +261,13 @@ Either clone or download the zip file from the repo and unzip it on your machine
 Now to run the app follow these steps:
 
 1 Open R-studio
+  
 2 Click on File->New Project
+  
 3 Choose existing directory from the pop-up window
+  
 4 Now select the directory where you have downloaded the project
+  
 5 Follow the on screen instruction
 
 Once the project has been created/opened go to app.R from the navigation tab on the bottom right of the IDE
