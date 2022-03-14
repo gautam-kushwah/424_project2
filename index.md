@@ -1,5 +1,5 @@
 
-# CS 424 - Project Page
+# CS 424 - Project Page - Sleepy Subway
 maintained by
 
 Gautam Kushwah
@@ -12,10 +12,11 @@ Gautam Kushwah
 
 # Important Links
 
-[Link to Shiny App for Project 1](https://gautam-kushwah.shinyapps.io/424project1/)
+[Link to Shiny App for Project 2](https://gautam-kushwah.shinyapps.io/424_project2/)
 
 ### Resources
 [link to Video Walkthrough](https://youtu.be/c_gRwMqGOCI)
+<iframe width="560" height="315" src="https://www.youtube.com/embed/6A5EpqqDOdk" frameborder="0" allowfullscreen></iframe>
 
 
 # Introduction
