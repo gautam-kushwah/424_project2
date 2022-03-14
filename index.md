@@ -25,7 +25,9 @@ The app is written in R and hosted on Shiny apps website. The app helps creates 
 user get a better understanding of the data and possibly make inferences.
 
 
+### Software version
 R version 4.1.2 (2021-11-01) -- "Bird Hippie"
+
 RStudio 2021.09.1+372 "Ghost Orchid" Release (8b9ced188245155642d024aa3630363df611088a, 2021-11-08) for macOS
 Mozilla/5.0 (Macintosh; Intel Mac OS X 12_2_1) AppleWebKit/537.36 (KHTML, like Gecko) QtWebEngine/5.12.10 Chrome/69.0.3497.128 Safari/537.36
 
