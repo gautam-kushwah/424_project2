@@ -282,6 +282,26 @@ To refer to the instructions on how to use and interact with app, please read th
 
 
 # Observation and Inferences 
+
   
+### 1
+<img width="740" alt="image" src="https://user-images.githubusercontent.com/40148194/158276742-9d5fc7ef-55fe-45d0-8c3d-477e2391a70c.png">
+<img width="730" alt="image" src="https://user-images.githubusercontent.com/40148194/158276808-5199b6ec-4083-4c48-8944-17f28cb37c9e.png">
+
+  
+### 2
+  <img width="843" alt="image" src="https://user-images.githubusercontent.com/40148194/158276971-6991dd64-7f09-4b66-afbf-ac4d5ba578cc.png">
+  
+  
+### 3
+  
+  <img width="755" alt="image" src="https://user-images.githubusercontent.com/40148194/158277899-30b15ed9-d48e-4592-ab9c-4c739811879b.png">
+  
+  <img width="733" alt="image" src="https://user-images.githubusercontent.com/40148194/158277979-f15ebe30-f339-4354-b7fe-14c6ca249bc7.png">
+  
+### 4
+
+
+
 
 
