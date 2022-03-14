@@ -72,7 +72,26 @@ These sections could be navigated through using the navigation bar on the left.
 <img width="1440" alt="image" src="https://user-images.githubusercontent.com/40148194/158264992-1571f6f4-8f8f-4897-8d2b-bff3d5c05aeb.png">
 
 
+The home page has all the controls for the visualisations shown i.e the map with station locations and their data, a bar plot with total entries for that day for all the stations and a table representing the same data, in a separate section marked input controls.
 
+From here the user can select the date and the visualisations would be updated.
+
+The user can select to order the bar graph and the data table using the "Select the order of the bar chart" dropdown. The three options available are
+Ascending, Alphabetical and descending.
+
+There are also **Prev Day** and **Next Day** button to quickly see data for the previous day and the next day respectively.
+
+The app has two modes of visualisation
+
+1. Single Date
+2. Different Dates
+
+The different dates mode enables the user to select two different dates and then uses the difference between the ridership information on those two dates to make all the visualsation. All other controls work as before.
+
+
+### Different dates mode
+
+<img width="1440" alt="image" src="https://user-images.githubusercontent.com/40148194/158268265-fa0da252-2cf6-42af-8c4a-3021cdc51b76.png">
 
 
 
