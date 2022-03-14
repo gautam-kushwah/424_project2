@@ -67,7 +67,10 @@ These sections could be navigated through using the navigation bar on the left.
 
 
 
-The user can compare the same station on both sides across different times using the dropdown menus in the side bar
+## Home Page
+
+<img width="1440" alt="image" src="https://user-images.githubusercontent.com/40148194/158264992-1571f6f4-8f8f-4897-8d2b-bff3d5c05aeb.png">
+
 
 
 
