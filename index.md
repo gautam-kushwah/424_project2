@@ -93,6 +93,11 @@ The different dates mode enables the user to select two different dates and then
 
 <img width="1440" alt="image" src="https://user-images.githubusercontent.com/40148194/158268265-fa0da252-2cf6-42af-8c4a-3021cdc51b76.png">
 
+### Bar chart sorted in a descending manner 
+
+<img width="1272" alt="image" src="https://user-images.githubusercontent.com/40148194/158273995-58aab997-adf6-420b-9752-19c15c4b8af4.png">
+
+
 
 
 ## Yearly Plots Page
@@ -106,6 +111,9 @@ The user can also select whether they want to see the visualisations in the form
 <img width="1440" alt="image" src="https://user-images.githubusercontent.com/40148194/158270629-d9195c2e-d8af-47f3-8539-b5fa07174121.png">
 
 
+## Data tables instead of bar charts
+
+<img width="1304" alt="image" src="https://user-images.githubusercontent.com/40148194/158274122-5347a201-ac1d-497e-bdee-727362cfe120.png">
 
 
 
