@@ -21,7 +21,13 @@ Gautam Kushwah
 
 # Introduction
 
-This is an app made using R studio and Shiny, the links to which have been provided above.
+The app is written in R and hosted on Shiny apps website. The app helps creates visualisation based on the data provided to it and helps the
+user get a better understanding of the data and possibly make inferences.
+
+
+R version 4.1.2 (2021-11-01) -- "Bird Hippie"
+RStudio 2021.09.1+372 "Ghost Orchid" Release (8b9ced188245155642d024aa3630363df611088a, 2021-11-08) for macOS
+Mozilla/5.0 (Macintosh; Intel Mac OS X 12_2_1) AppleWebKit/537.36 (KHTML, like Gecko) QtWebEngine/5.12.10 Chrome/69.0.3497.128 Safari/537.36
 
 ### What is R?
 
@@ -35,23 +41,31 @@ Shiny is an R package that makes it easy to build interactive web apps straight 
 
 ### Purpose of this App
 
-The purpose of this app is to use the data provided on riders on the Chicago L over the past 20 years and use shiny to give people an interactive interface to create those visualizations. The app provides various data visualizations in the form of bar graphs breaking down data across all years, individual years, months, and even days in a week over a month.
+The purpose of this app is to use the data provided on riders on the Chicago L over the past 20 years and use shiny to give people an interactive interface to create those visualizations. 
+The app provides an interactive map with the locations of the stations marked on it with their respective line colors and tapping on the markers gives more information about the line that station serves and and the number of rides on a particular date.
+The dashboard can also provide the difference in the number of rides between two dates on a particular station.
 
-It shows interesting trends and helps understand the user the behavior of the riders on the Chicago which in turn could be explained by various events occurring at the same time.
+The data is presented on the map, in the form of a bar plot and also in the form of a table with controls for each of them
+
+The app provides various data visualizations in the form of bar graphs breaking down data across all years, individual years, months, and even days in a week over a month.
+
 
 The app could also help find interesting dates in the last 20 years which might have affected the behavior of the riders and thus help us understand the power of data and data visualization.
 
 ### How to use the App?
 
-You can head over to the app here. Upon opening the app, you would be greeted with a Shiny dashboard which would give you various bar charts. 
+You can head over to the app [!here](https://gautam-kushwah.shinyapps.io/424_project2/). Upon opening the app, you would be greeted with a Shiny dashboard which would give you a map with locations of the stations marked and a bar plot for the toal number of rides for all the staions on that day. 
 
-The screen in divided into 3 parts:
-1. The Side Bar: This has navigation controls and data input controls for the charts on right hand side of the screen
-2. Left Region: This shows various bar charts for station one, which by default is UIC-Halsted.
-3. Right Region: This shows various bar charts for station two, which by default is O’Hare Airport.
+The app has three sections
 
-[!Link to image if not rendered](https://drive.google.com/file/d/15a20v0eG29fKueH79qzyFh6lcrEeDG6G/view?usp=sharing)
-![image](./image.png)
+1. Home Page
+2. About Page
+3. Yearly Plots page
+
+These sections could be navigated through using the navigation bar on the left.
+<img width="407" alt="image" src="https://user-images.githubusercontent.com/40148194/158264770-5178df3c-abef-4f86-adf9-9f2fe1809b1a.png">
+
+
 
 The user can compare the same station on both sides across different times using the dropdown menus in the side bar
 
