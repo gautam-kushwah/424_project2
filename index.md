@@ -133,22 +133,22 @@ The other files which contained the latitude and longitude of the stations was a
 The columns are as follows
 
 **STOP_ID**  
-**DIRECTION_ ID	** Normal Direction of train taffic at the platform
-STOP_NAME	
-STATION_NAME	
-STATION_DESCRIPTIVE_NAME	- A more fully descriptive name of a station. 
-MAP_ID	
-ADA	- Boolean (if the station is ada compliant)
-RED - Boolean (if the station serves red line)
-BLUE - Boolean (if the station serves blue line)
-G - Boolean (if the station serves green line)
-BRN - Boolean (if the station serves brown line)
-P - Boolean (if the station serves purple line)
-Pexp - Boolean (if the station serves Purple Express line)
-Y - Boolean (if the station serves Yellow line)
-Pnk - Boolean (if the station serves Pink line)
-O - Boolean (if the station serves Orange line)
-Location - The latitude and longitude values
+**DIRECTION_ ID** Normal Direction of train taffic at the platform
+**STOP_NAME**
+**STATION_NAME**
+**STATION_DESCRIPTIVE_NAME**	- A more fully descriptive name of a station. 
+**MAP_ID**
+**ADA**	- Boolean (if the station is ada compliant)
+**RED** - Boolean (if the station serves red line)
+**BLUE** - Boolean (if the station serves blue line)
+**G** - Boolean (if the station serves green line)
+**BRN** - Boolean (if the station serves brown line)
+**P** - Boolean (if the station serves purple line)
+**Pexp** - Boolean (if the station serves Purple Express line)
+**Y** - Boolean (if the station serves Yellow line)
+**Pnk** - Boolean (if the station serves Pink line)
+**O** - Boolean (if the station serves Orange line)
+**Location** - The latitude and longitude values
 
 
 
@@ -190,11 +190,21 @@ I then used a code editor to verify if the files were broken down correctly, and
 temp = list.files(pattern="parta..tsv")
 allData2 <- lapply(temp, read.delim)
 allData <- do.call(rbind, allData2)
-
 ```
 
-
+I then extracted the the info on the lines the stop serves from  STATION_DESCRIPTIVE_NAME and created a new column and then merged the ridership data table with the stop info table
+ 
+```
+lat_long <- read.table(file = "CTA_-_System_Information_-_List_of__L__Stops.tsv", sep = "\t", header = TRUE, quote = "\"")
+lat_long$lines <- str_extract(lat_long$STATION_DESCRIPTIVE_NAME, "\\(.*\\)")
+lat_long$lines <- str_remove_all(lat_long$lines, "[\\(\\)]")
+lat_long <- lat_long %>% distinct(MAP_ID, lines, .keep_all = TRUE)
+mergedData <- merge(x = allData, y= lat_long, by.x = c("station_id"), by.y = c("MAP_ID"), all.x = TRUE)
+```
+  
+I then extracted the lat
 The next step included breaking down the entire dataset into three individual data sets, each based on the stations I was interested in. For this project, I used three stations namely : **UIC-Halsted**, **O’Hare Airport** and one closest to which I live i.e **Polk**.
+
 
 Each dataset had to grouped by three criterias:
 1. Years
