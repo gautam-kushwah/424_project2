@@ -130,7 +130,47 @@ The columns are as follows
 
 The other files which contained the latitude and longitude of the stations was also taken from Chicago data portal which could be found [here](https://data.cityofchicago.org/Transportation/CTA-System-Information-List-of-L-Stops/8pix-ypme)
 
+The columns are as follows
 
+**STOP_ID**  
+**DIRECTION_ ID	** Normal Direction of train taffic at the platform
+STOP_NAME	
+STATION_NAME	
+STATION_DESCRIPTIVE_NAME	- A more fully descriptive name of a station. 
+MAP_ID	
+ADA	- Boolean (if the station is ada compliant)
+RED - Boolean (if the station serves red line)
+BLUE - Boolean (if the station serves blue line)
+G - Boolean (if the station serves green line)
+BRN - Boolean (if the station serves brown line)
+P - Boolean (if the station serves purple line)
+Pexp - Boolean (if the station serves Purple Express line)
+Y - Boolean (if the station serves Yellow line)
+Pnk - Boolean (if the station serves Pink line)
+O - Boolean (if the station serves Orange line)
+Location - The latitude and longitude values
+
+
+
+
+### R Libraries required to process the data
+
+```
+library(shiny)
+library(lubridate)
+library(ggplot2)
+library(shinydashboard)
+library(dplyr)
+library(stringr)
+library(leaflet)
+library(leaflet.providers)
+library(leaflet.extras)
+library(DT)
+library(shinyjs)
+library(tidyverse)
+library(reshape2) 
+
+```
 
 The date was provided in a chr format, therefore it had to be converted into a usable format which was achieved through a R library called **lubridate**
 
@@ -143,7 +183,15 @@ split -b <size in kb> <filename> <name of parts>
 The <name of parts> signifies what the broken down files would be named.
 
 
-I then used a code editor to verify if the files were broken down correctly, and upon verifying that I loaded the filenames in a list in R and then stitched them together into a single table, hence being able to work with all the rows.
+I then used a code editor to verify if the files were broken down correctly, and upon verifying that I loaded the filenames in a list in R and then stitched them together into a single table, hence being able to work with all the rows, using the code below
+  
+```
+#read all file names in a temp variable
+temp = list.files(pattern="parta..tsv")
+allData2 <- lapply(temp, read.delim)
+allData <- do.call(rbind, allData2)
+
+```
 
 
 The next step included breaking down the entire dataset into three individual data sets, each based on the stations I was interested in. For this project, I used three stations namely : **UIC-Halsted**, **O’Hare Airport** and one closest to which I live i.e **Polk**.
