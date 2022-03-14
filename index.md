@@ -320,7 +320,7 @@ the following ridership information on October 24th shows no entries for washing
   
   Daily entries for Washington for the year 2006
   
-  <img width="752" alt="image" src="https://user-images.githubusercontent.com/40148194/158279566-df101170-e2eb-4a46-bd1a-fc515779bcc9.png">
+  <img width="745" alt="image" src="https://user-images.githubusercontent.com/40148194/158279721-537474ef-aef9-42f7-8859-fbf09ae7a3f9.png">
 
 
   
