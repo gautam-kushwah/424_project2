@@ -15,7 +15,7 @@ Gautam Kushwah
 [Link to Shiny App for Project 2](https://gautam-kushwah.shinyapps.io/424_project2/)
 
 ### Resources
-
+[Link to Video Walkthrough](https://www.youtube.com/watch?v=15eiq648v3A)
 <iframe width="560" height="315" src="https://www.youtube.com/watch?v=15eiq648v3A" frameborder="0" allowfullscreen></iframe>
 
 
