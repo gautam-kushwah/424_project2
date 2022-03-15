@@ -291,13 +291,27 @@ To refer to the instructions on how to use and interact with app, please read th
   
   Using these images from the map it is clear that a new station was added to the yellow line
   
-### 2
+  Furthermore, we can inspect that there is a huge gap in ridership entries in the year 2015 for Oakton/Skokie
+  A quick internet search reveals that there was a dam collapse near the railways lines leading to closure of the station
+  
+  <img width="922" alt="image" src="https://user-images.githubusercontent.com/40148194/158281071-4c8a78e8-c4f8-4fb6-ba0c-8f7bd8dc23ca.png">
+
+  
+### 2 Berwyn and Lawrence closed
   <img width="843" alt="image" src="https://user-images.githubusercontent.com/40148194/158276971-6991dd64-7f09-4b66-afbf-ac4d5ba578cc.png">
   
   Berwyn and lawrence stations show no ridership information for the above date, on searching the internet it becomes clear that these stations are temporarily closed
   
+  Ridership info for Berwyn
+  <img width="1176" alt="image" src="https://user-images.githubusercontent.com/40148194/158280299-095818c0-9cef-4c33-baa8-65355632adf9.png">
+
+  Ridership info for lawrence
   
-### 3
+  <img width="1202" alt="image" src="https://user-images.githubusercontent.com/40148194/158280383-db1f7a91-8b11-4ee0-a582-c6451a46dfcc.png">
+
+  
+  
+### 3 Washington abandoned on the red line
   
   <img width="755" alt="image" src="https://user-images.githubusercontent.com/40148194/158277899-30b15ed9-d48e-4592-ab9c-4c739811879b.png">
   
@@ -325,7 +339,7 @@ the following ridership information on October 24th shows no entries for washing
 
   
   
-### 4
+ On the wikipedia page it says that the station was closed as a development of a superstaion is planned
 
 
 
