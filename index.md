@@ -16,7 +16,7 @@ Gautam Kushwah
 
 ### Resources
 [link to Video Walkthrough](https://youtu.be/c_gRwMqGOCI)
-<iframe width="560" height="315" src="https://www.youtube.com/embed/6A5EpqqDOdk" frameborder="0" allowfullscreen></iframe>
+<iframe width="560" height="315" src="https://www.youtube.com/watch?v=15eiq648v3A" frameborder="0" allowfullscreen></iframe>
 
 
 # Introduction
